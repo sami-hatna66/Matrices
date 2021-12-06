@@ -64,6 +64,10 @@ public:
             return 0;
         }
     }
+    
+    void setVal(int row, int col, double newVal) {
+        content[row][col] = newVal;
+    }
 };
 
 unsigned long Matrix::numRows() {
@@ -100,29 +104,6 @@ void Matrix::printMatrix() {
     }
 }
 
-Matrix operator+(Matrix& m1, Matrix& m2) {
-    try {
-        if (m1.numCols() != m2.numCols() || m1.numRows() != m2.numRows()) {
-            throw 505;
-        }
-        else {
-            vector<vector<double>> result = {};
-            
-            for (int row = 0; row < m1.numRows(); row++) {
-                vector<double> intermediary = {};
-                for (int col = 0; col < m1.numCols(); col++) {
-                    intermediary.push_back(m1.getVal(row, col) + m2.getVal(row, col));
-                }
-                result.push_back(intermediary);
-            }
-            return Matrix(result);
-        }
-    } catch (...) {
-        cout << "Invalid dimensions" << endl;
-        return Matrix({{0}});
-    }
-}
-
 Matrix operator*(Matrix&m, int scalar) {
     vector<vector<double>> result = {};
     
@@ -142,10 +123,28 @@ Matrix operator*(int scalar, Matrix &m) {
     return m * scalar;
 }
 
-Matrix operator+=(Matrix &m1, Matrix &m2) {
-    return Matrix({{1, 1, 1}, {1, 1, 1}, {1, 1, 1}});
+Matrix& operator+=(Matrix& lhs, Matrix rhs) {
+    try {
+        if (lhs.numCols() != rhs.numCols() || lhs.numRows() != rhs.numRows()) {
+            throw 505;
+        }
+        else {
+            for (int row = 0; row < lhs.numRows(); row++) {
+                for (int col = 0; col < lhs.numCols(); col++) {
+                    lhs.setVal(row, col, lhs.getVal(row, col) + rhs.getVal(row, col));
+                }
+            }
+        }
+    } catch (...) {
+        cout << "Invalid dimensions" << endl;
+    }
+    
+    return lhs;
 }
 
+Matrix operator+(Matrix lhs, Matrix rhs) {
+    return lhs += rhs;
+}
 
 
 
@@ -154,8 +153,8 @@ int main() {
     
     Matrix test2 = Matrix({{33, 55, 44}, {55, 44, 33}, {44, 55, 33}});
     
-    Matrix test3 = 7 * test1;
-    test3.printMatrix();
+    test2 += test1;
+    test2.printMatrix();
     
     return 0;
 }
