@@ -41,7 +41,7 @@ public:
     }
     
     // Use if operator needs to access private attributes
-    // friend Matrix operator*(Matrix&m1, int scalar);
+    // friend Matrix& operator*=(Matrix& lhs, Matrix rhs);
     
     void printMatrix();
     unsigned long numRows();
@@ -67,6 +67,10 @@ public:
     
     void setVal(int row, int col, double newVal) {
         content[row][col] = newVal;
+    }
+    
+    void setContent(vector<vector<double>> newContent) {
+        content = newContent;
     }
 };
 
@@ -102,6 +106,26 @@ void Matrix::printMatrix() {
         forPrint += "|";
         cout << forPrint << endl;
     }
+}
+
+Matrix& operator*=(Matrix& lhs, Matrix rhs) {
+    vector<vector<double>> newContent = {};
+    
+    for (int i = 0; i < lhs.numRows(); i++) {
+        vector<double> newRow = {};
+        for (int j = 0; j < rhs.numCols(); j++) {
+            double sum = 0;
+            for (int k = 0; k < lhs.numCols(); k++) {
+                sum += (lhs.getVal(i, k) * rhs.getVal(k, j));
+            }
+            newRow.push_back(sum);
+        }
+        newContent.push_back(newRow);
+    }
+    
+    lhs.setContent(newContent);
+    
+    return lhs;
 }
 
 Matrix& operator*=(Matrix& lhs, double scalar) {
@@ -153,8 +177,8 @@ int main() {
     
     Matrix test2 = Matrix({{33, 55, 44}, {55, 44, 33}, {44, 55, 33}});
     
-    Matrix test3 = 2 * test2;
-    test3.printMatrix();
+    test2 *= test1;
+    test2.printMatrix();
     
     return 0;
 }
