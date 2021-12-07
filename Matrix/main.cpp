@@ -104,23 +104,23 @@ void Matrix::printMatrix() {
     }
 }
 
-Matrix operator*(Matrix&m, int scalar) {
-    vector<vector<double>> result = {};
-    
-    for (int row = 0; row < m.numRows(); row++) {
-        vector <double> intermediary = {};
-        for (int col = 0; col < m.numCols(); col++) {
-            intermediary.push_back(m.getVal(row, col) * scalar);
+Matrix& operator*=(Matrix& lhs, double scalar) {
+    for (int row = 0; row < lhs.numRows(); row++) {
+        for (int col = 0; col < lhs.numCols(); col++) {
+            lhs.setVal(row, col, scalar * lhs.getVal(row, col));
         }
-        result.push_back(intermediary);
     }
     
-    return Matrix(result);
+    return lhs;
+}
+
+Matrix operator*(Matrix lhs, double scalar) {
+    return lhs *= scalar;
 }
 
 // For commutativity
-Matrix operator*(int scalar, Matrix &m) {
-    return m * scalar;
+Matrix operator*(double scalar, Matrix rhs) {
+    return rhs *= scalar;
 }
 
 Matrix& operator+=(Matrix& lhs, Matrix rhs) {
@@ -153,8 +153,8 @@ int main() {
     
     Matrix test2 = Matrix({{33, 55, 44}, {55, 44, 33}, {44, 55, 33}});
     
-    test2 += test1;
-    test2.printMatrix();
+    Matrix test3 = 2 * test2;
+    test3.printMatrix();
     
     return 0;
 }
