@@ -72,6 +72,43 @@ public:
     void setContent(vector<vector<double>> newContent) {
         content = newContent;
     }
+    
+    // Row operations
+    void swapRow(int row1, int row2) {
+        try {
+            if (row1 < this->numRows() && row2 < this->numRows()) {
+                swap(content[row2], content[row1]);
+            } else { throw 505; }
+        } catch (...) {
+            cout << "Row index out of range" << endl;
+        }
+    }
+    
+    void multiplyRow(int row, double scalar) {
+        try {
+            if (row < this->numRows()) {
+                for (int i = 0; i < this->numCols(); i++) {
+                    content[row][i] *= scalar;
+                }
+            } else { throw 505; }
+        } catch (...) {
+            cout << "Row index out of range" << endl;
+        }
+    }
+    
+    void transpose() {
+        vector<vector<double>> newContent = {};
+        
+        for (int i = 0; i < this->numCols(); i++) {
+            vector<double> intermediary = {};
+            for (int j = 0; j < this->numRows(); j++) {
+                intermediary.push_back({content[j][i]});
+            }
+            newContent.push_back(intermediary);
+        }
+        
+        content = newContent;
+    }
 };
 
 unsigned long Matrix::numRows() {
@@ -111,9 +148,7 @@ void Matrix::printMatrix() {
 // Matrix-Matrix multiplication
 Matrix& operator*=(Matrix& lhs, Matrix rhs) {
     try {
-        if (lhs.numCols() != rhs.numRows()) {
-            throw 505;
-        }
+        if (lhs.numCols() != rhs.numRows()) { throw 505; }
         else {
             vector<vector<double>> newContent = {};
             
@@ -214,10 +249,10 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{33, 55, 44, 88}, {55, 44, 33, 66}});
+    Matrix test2 = Matrix({{1,2}, {5,6}});
     
-    Matrix test3 = test2 * test1;
-    test3.printMatrix();
+    test1.transpose();
+    test1.printMatrix();
     
     return 0;
 }
