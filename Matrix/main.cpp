@@ -96,9 +96,28 @@ public:
         }
     }
     
+    void addScalarMultiple(int rowTarget, int rowAdding, int scalar) {
+        try {
+            if (rowAdding > this->numRows() || rowTarget > this->numRows()) {
+                throw 505;
+            }
+            else {
+                vector<double> multiplied = {};
+                for (int i = 0; i < this->numCols(); i++) {
+                    multiplied.push_back(this->getVal(rowAdding, i) * scalar);
+                }
+                for (int k = 0; k < multiplied.size(); k++) {
+                    content[rowTarget][k] += multiplied[k];
+                }
+            }
+        } catch (...) {
+            cout << "Invalid dimensions" << endl;
+        }
+    }
+    
     void transpose() {
         vector<vector<double>> newContent = {};
-        
+
         for (int i = 0; i < this->numCols(); i++) {
             vector<double> intermediary = {};
             for (int j = 0; j < this->numRows(); j++) {
@@ -106,7 +125,7 @@ public:
             }
             newContent.push_back(intermediary);
         }
-        
+
         content = newContent;
     }
 };
@@ -246,12 +265,17 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 
 
 
+
+
+
+
+
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
     Matrix test2 = Matrix({{1,2}, {5,6}});
     
-    test1.transpose();
+    test1.addScalarMultiple(0, 2, 4);
     test1.printMatrix();
     
     return 0;
