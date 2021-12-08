@@ -185,6 +185,30 @@ Matrix operator+(Matrix lhs, Matrix rhs) {
     return lhs += rhs;
 }
 
+// Subtraction
+Matrix& operator-=(Matrix& lhs, Matrix rhs) {
+    try {
+        if (lhs.numCols() != rhs.numCols() || lhs.numRows() != rhs.numRows()) {
+            throw 505;
+        }
+        else {
+            for (int row = 0; row < lhs.numRows(); row++) {
+                for (int col = 0; col < lhs.numCols(); col++) {
+                    lhs.setVal(row, col, lhs.getVal(row, col) - rhs.getVal(row, col));
+                }
+            }
+        }
+    } catch (...) {
+        cout << "Invalid dimensions" << endl;
+    }
+    
+    return lhs;
+}
+
+Matrix operator-(Matrix lhs, Matrix rhs) {
+    return lhs -= rhs;
+}
+
 
 
 int main() {
