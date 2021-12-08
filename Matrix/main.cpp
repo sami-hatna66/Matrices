@@ -108,26 +108,41 @@ void Matrix::printMatrix() {
     }
 }
 
+// Matrix-Matrix multiplication
 Matrix& operator*=(Matrix& lhs, Matrix rhs) {
-    vector<vector<double>> newContent = {};
-    
-    for (int i = 0; i < lhs.numRows(); i++) {
-        vector<double> newRow = {};
-        for (int j = 0; j < rhs.numCols(); j++) {
-            double sum = 0;
-            for (int k = 0; k < lhs.numCols(); k++) {
-                sum += (lhs.getVal(i, k) * rhs.getVal(k, j));
-            }
-            newRow.push_back(sum);
+    try {
+        if (lhs.numCols() != rhs.numRows()) {
+            throw 505;
         }
-        newContent.push_back(newRow);
+        else {
+            vector<vector<double>> newContent = {};
+            
+            for (int i = 0; i < lhs.numRows(); i++) {
+                vector<double> newRow = {};
+                for (int j = 0; j < rhs.numCols(); j++) {
+                    double sum = 0;
+                    for (int k = 0; k < lhs.numCols(); k++) {
+                        sum += (lhs.getVal(i, k) * rhs.getVal(k, j));
+                    }
+                    newRow.push_back(sum);
+                }
+                newContent.push_back(newRow);
+            }
+            
+            lhs.setContent(newContent);
+        }
+    } catch (...) {
+        cout << "Invalid dimensions" << endl;
     }
-    
-    lhs.setContent(newContent);
     
     return lhs;
 }
 
+Matrix operator*(Matrix lhs, Matrix rhs) {
+    return lhs *= rhs;
+}
+
+// Matrix-Scalar multiplication
 Matrix& operator*=(Matrix& lhs, double scalar) {
     for (int row = 0; row < lhs.numRows(); row++) {
         for (int col = 0; col < lhs.numCols(); col++) {
@@ -141,12 +156,12 @@ Matrix& operator*=(Matrix& lhs, double scalar) {
 Matrix operator*(Matrix lhs, double scalar) {
     return lhs *= scalar;
 }
-
 // For commutativity
 Matrix operator*(double scalar, Matrix rhs) {
     return rhs *= scalar;
 }
 
+// Addition
 Matrix& operator+=(Matrix& lhs, Matrix rhs) {
     try {
         if (lhs.numCols() != rhs.numCols() || lhs.numRows() != rhs.numRows()) {
@@ -173,12 +188,12 @@ Matrix operator+(Matrix lhs, Matrix rhs) {
 
 
 int main() {
-    Matrix test1 = Matrix({{1, 2, 4}, {3, 4, 5}, {44, 55, 33}});
+    Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{33, 55, 44}, {55, 44, 33}, {44, 55, 33}});
+    Matrix test2 = Matrix({{33, 55, 44, 88}, {55, 44, 33, 66}});
     
-    test2 *= test1;
-    test2.printMatrix();
+    Matrix test3 = test2 * test1;
+    test3.printMatrix();
     
     return 0;
 }
