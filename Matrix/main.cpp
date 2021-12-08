@@ -46,6 +46,7 @@ public:
     void printMatrix();
     unsigned long numRows();
     unsigned long numCols();
+    void transpose();
     
     // matrix indexing begins at 0
     double getVal(int row, int col) {
@@ -115,19 +116,7 @@ public:
         }
     }
     
-    void transpose() {
-        vector<vector<double>> newContent = {};
-
-        for (int i = 0; i < this->numCols(); i++) {
-            vector<double> intermediary = {};
-            for (int j = 0; j < this->numRows(); j++) {
-                intermediary.push_back({content[j][i]});
-            }
-            newContent.push_back(intermediary);
-        }
-
-        content = newContent;
-    }
+    
 };
 
 unsigned long Matrix::numRows() {
@@ -136,6 +125,18 @@ unsigned long Matrix::numRows() {
 
 unsigned long Matrix::numCols() {
     return content[0].size();
+}
+    
+void Matrix::transpose() {
+    vector<vector<double>> newContent = {};
+    for (int i = 0; i < this->numCols(); i++) {
+        vector<double> intermediary = {};
+        for (int j = 0; j < this->numRows(); j++) {
+            intermediary.push_back({content[j][i]});
+        }
+        newContent.push_back(intermediary);
+    }
+    this->setContent(newContent);
 }
 
 void Matrix::printMatrix() {
@@ -276,6 +277,9 @@ int main() {
     Matrix test2 = Matrix({{1,2}, {5,6}});
     
     test1.addScalarMultiple(0, 2, 4);
+    test1 *= test2;
+    test1 *= 2;
+    test1.transpose();
     test1.printMatrix();
     
     return 0;
