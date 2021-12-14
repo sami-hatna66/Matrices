@@ -116,7 +116,20 @@ public:
         }
     }
     
-    
+    void ref() {
+        int col = 0;
+        for (int row = 0; row < min(this->numRows(), this->numCols()); row++) {
+            this->multiplyRow(row, 1/this->getVal(row, col));
+            
+            for (int row2 = row+1; row2 < this->numRows(); row2++) {
+                this->addScalarMultiple(row2, row, -this->getVal(row2, col));
+            }
+            
+            this->printMatrix();
+            cout <<endl;
+            col++;
+        }
+    }
 };
 
 unsigned long Matrix::numRows() {
@@ -274,13 +287,12 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{1,2}, {5,6}});
-    
-    test1.addScalarMultiple(0, 2, 4);
-    test1 *= test2;
-    test1 *= 2;
-    test1.transpose();
-    test1.printMatrix();
+    Matrix test2 = Matrix({{2, 2, 5, 6}, {5, 6, 4, 4}, {8, 5, 72, 3}});
+        
+    test2.printMatrix();
+    cout << endl;
+    test2.ref();
+    test2.printMatrix();
     
     return 0;
 }
