@@ -116,19 +116,53 @@ public:
         }
     }
     
+    // Convert matrix to row echelon form
     void ref() {
         int col = 0;
         for (int row = 0; row < min(this->numRows(), this->numCols()); row++) {
             this->multiplyRow(row, 1/this->getVal(row, col));
             
+            //this->printMatrix();
+            //cout << endl;
             for (int row2 = row+1; row2 < this->numRows(); row2++) {
                 this->addScalarMultiple(row2, row, -this->getVal(row2, col));
             }
             
-            this->printMatrix();
-            cout <<endl;
+            //this->printMatrix();
+            //cout <<endl;
             col++;
         }
+    }
+    
+    // Calculate determinant using cofactor expansion
+    double determinant() {
+        double det;
+        
+        if (this->numRows() == 2) {
+            det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
+        }
+        else {
+            det = 0;
+            this->printMatrix();
+            for (int i = 0; i < this->numCols(); i++) {
+                vector<vector<double>> newMatContent = {};
+                for (int j = 1; j < this->numCols(); j++) {
+                    vector<double> newRow = {};
+                    for (int k = 0; k < this->numCols(); k++) {
+                        if (k != i) {
+                            newRow.push_back(this->getVal(j, k));
+                        }
+                    }
+                    newMatContent.push_back(newRow);
+                }
+                cout << endl;
+                Matrix newMat = Matrix(newMatContent);
+                newMat.printMatrix();
+                det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
+            }
+        }
+        
+        return det;
     }
 };
 
@@ -139,7 +173,8 @@ unsigned long Matrix::numRows() {
 unsigned long Matrix::numCols() {
     return content[0].size();
 }
-    
+ 
+// Transpose matrix
 void Matrix::transpose() {
     vector<vector<double>> newContent = {};
     for (int i = 0; i < this->numCols(); i++) {
@@ -287,12 +322,9 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{2, 2, 5, 6}, {5, 6, 4, 4}, {8, 5, 72, 3}});
+    Matrix test2 = Matrix({{1, 66, 9, 4}, {3, 88, 6, 5}, {7, 8, 44, 8}, {44, 5, 6, 7}});
         
-    test2.printMatrix();
-    cout << endl;
-    test2.ref();
-    test2.printMatrix();
+    cout << test2.determinant() << endl;
     
     return 0;
 }
