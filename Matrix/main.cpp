@@ -47,6 +47,9 @@ public:
     unsigned long numRows();
     unsigned long numCols();
     void transpose();
+    void ref();
+    double determinant();
+    Matrix cofactor();
     
     // matrix indexing begins at 0
     double getVal(int row, int col) {
@@ -116,72 +119,8 @@ public:
         }
     }
     
-    // Convert matrix to row echelon form
-    void ref() {
-        int col = 0;
-        for (int row = 0; row < min(this->numRows(), this->numCols()); row++) {
-            this->multiplyRow(row, 1/this->getVal(row, col));
-            
-            //this->printMatrix();
-            //cout << endl;
-            for (int row2 = row+1; row2 < this->numRows(); row2++) {
-                this->addScalarMultiple(row2, row, -this->getVal(row2, col));
-            }
-            
-            //this->printMatrix();
-            //cout <<endl;
-            col++;
-        }
-    }
     
-    // Calculate determinant using cofactor expansion
-    double determinant() {
-        double det;
-        
-        try {
-            if (this->numCols() != this->numRows()) {
-                throw 505;
-            }
-            
-            else {
-                switch(this->numRows()) {
-                    case 1:
-                        det = this->getVal(0, 0);
-                        break;
-                    case 2:
-                        det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
-                        break;
-                    case 3:
-                        det = (this->getVal(0, 0) * this->getVal(1, 1) * this->getVal(2, 2)) + (this->getVal(0, 1) * this->getVal(1, 2) * this->getVal(2, 0)) + (this->getVal(0, 2) * this->getVal(1, 0) * this->getVal(2, 1)) - (this->getVal(0, 2) * this->getVal(1, 1) * this->getVal(2, 0)) - (this->getVal(0, 0) * this->getVal(1, 2) * this->getVal(2, 1)) - (this->getVal(0, 1) * this->getVal(1, 0) * this->getVal(2, 2));
-                        break;
-                    default:
-                        det = 0;
-                        this->printMatrix();
-                        for (int i = 0; i < this->numCols(); i++) {
-                            vector<vector<double>> newMatContent = {};
-                            for (int j = 1; j < this->numCols(); j++) {
-                                vector<double> newRow = {};
-                                for (int k = 0; k < this->numCols(); k++) {
-                                    if (k != i) {
-                                        newRow.push_back(this->getVal(j, k));
-                                    }
-                                }
-                                newMatContent.push_back(newRow);
-                            }
-                            cout << endl;
-                            Matrix newMat = Matrix(newMatContent);
-                            newMat.printMatrix();
-                            det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
-                        }
-                }
-            }
-        } catch(...) {
-            cout << "Matrix must be square";
-            return 0;
-        }
-        
-        return det;
-    }
+    
 };
 
 unsigned long Matrix::numRows() {
@@ -190,6 +129,103 @@ unsigned long Matrix::numRows() {
 
 unsigned long Matrix::numCols() {
     return content[0].size();
+}
+
+// Convert matrix to row echelon form
+void Matrix::ref() {
+    int col = 0;
+    for (int row = 0; row < min(this->numRows(), this->numCols()); row++) {
+        this->multiplyRow(row, 1/this->getVal(row, col));
+        
+        //this->printMatrix();
+        //cout << endl;
+        for (int row2 = row+1; row2 < this->numRows(); row2++) {
+            this->addScalarMultiple(row2, row, -this->getVal(row2, col));
+        }
+        
+        //this->printMatrix();
+        //cout <<endl;
+        col++;
+    }
+}
+
+// Calculate determinant using cofactor expansion
+double Matrix::determinant() {
+    double det;
+    
+    try {
+        if (this->numCols() != this->numRows()) {
+            throw 505;
+        }
+        
+        else {
+            switch(this->numRows()) {
+                case 1:
+                    det = this->getVal(0, 0);
+                    break;
+                case 2:
+                    det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
+                    break;
+                case 3:
+                    det = (this->getVal(0, 0) * this->getVal(1, 1) * this->getVal(2, 2)) + (this->getVal(0, 1) * this->getVal(1, 2) * this->getVal(2, 0)) + (this->getVal(0, 2) * this->getVal(1, 0) * this->getVal(2, 1)) - (this->getVal(0, 2) * this->getVal(1, 1) * this->getVal(2, 0)) - (this->getVal(0, 0) * this->getVal(1, 2) * this->getVal(2, 1)) - (this->getVal(0, 1) * this->getVal(1, 0) * this->getVal(2, 2));
+                    break;
+                default:
+                    det = 0;
+                    this->printMatrix();
+                    for (int i = 0; i < this->numCols(); i++) {
+                        vector<vector<double>> newMatContent = {};
+                        for (int j = 1; j < this->numCols(); j++) {
+                            vector<double> newRow = {};
+                            for (int k = 0; k < this->numCols(); k++) {
+                                if (k != i) {
+                                    newRow.push_back(this->getVal(j, k));
+                                }
+                            }
+                            newMatContent.push_back(newRow);
+                        }
+                        cout << endl;
+                        Matrix newMat = Matrix(newMatContent);
+                        newMat.printMatrix();
+                        det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
+                    }
+            }
+        }
+    } catch(...) {
+        cout << "Matrix must be square";
+        return 0;
+    }
+    
+    return det;
+}
+
+// Return cofactor matrix
+Matrix Matrix::cofactor() {
+    vector<vector<double>> cofactorContent = {};
+    
+    for (int i = 0; i < this->numRows(); i++) {
+        vector<double> cofactorRow = {};
+        for (int j = 0; j < this->numCols(); j++) {
+            vector<vector<double>> prunedContent = {};
+            for (int i2 = 0; i2 < this->numRows(); i2++) {
+                vector<double> prunedRow = {};
+                for (int j2 = 0; j2 < this->numCols(); j2++) {
+                    if (i2 != i && j2 != j) {
+                        prunedRow.push_back(this->getVal(i2, j2));
+                    }
+                }
+                if (prunedRow.size() > 0) {
+                    prunedContent.push_back(prunedRow);
+                }
+            }
+            Matrix prunedMat = Matrix(prunedContent);
+            prunedMat.printMatrix();
+            cout << endl;
+            cofactorRow.push_back(pow(-1, i + j) * prunedMat.determinant());
+        }
+        cofactorContent.push_back(cofactorRow);
+    }
+    
+    return Matrix(cofactorContent);
 }
  
 // Transpose matrix
@@ -340,9 +376,11 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{5, -7, 2, 2}, {0, 3, 0, -4}, {-5, -8, 0, 3}, {0, 5, 0, -6}});
+    Matrix test2 = Matrix({{1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16}});
+    
+    Matrix pog = test2.cofactor();
         
-    cout << test1.determinant() << endl;
+    pog.printMatrix();
     
     return 0;
 }
