@@ -138,28 +138,35 @@ public:
     double determinant() {
         double det;
         
-        if (this->numRows() == 2) {
-            det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
-        }
-        else {
-            det = 0;
-            this->printMatrix();
-            for (int i = 0; i < this->numCols(); i++) {
-                vector<vector<double>> newMatContent = {};
-                for (int j = 1; j < this->numCols(); j++) {
-                    vector<double> newRow = {};
-                    for (int k = 0; k < this->numCols(); k++) {
-                        if (k != i) {
-                            newRow.push_back(this->getVal(j, k));
+        switch(this->numRows()) {
+            case 1:
+                det = this->getVal(0, 0);
+                break;
+            case 2:
+                det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
+                break;
+            case 3:
+                det = (this->getVal(0, 0) * this->getVal(1, 1) * this->getVal(2, 2)) + (this->getVal(0, 1) * this->getVal(1, 2) * this->getVal(2, 0)) + (this->getVal(0, 2) * this->getVal(1, 0) * this->getVal(2, 1)) - (this->getVal(0, 2) * this->getVal(1, 1) * this->getVal(2, 0)) - (this->getVal(0, 0) * this->getVal(1, 2) * this->getVal(2, 1)) - (this->getVal(0, 1) * this->getVal(1, 0) * this->getVal(2, 2));
+                break;
+            default:
+                det = 0;
+                this->printMatrix();
+                for (int i = 0; i < this->numCols(); i++) {
+                    vector<vector<double>> newMatContent = {};
+                    for (int j = 1; j < this->numCols(); j++) {
+                        vector<double> newRow = {};
+                        for (int k = 0; k < this->numCols(); k++) {
+                            if (k != i) {
+                                newRow.push_back(this->getVal(j, k));
+                            }
                         }
+                        newMatContent.push_back(newRow);
                     }
-                    newMatContent.push_back(newRow);
+                    cout << endl;
+                    Matrix newMat = Matrix(newMatContent);
+                    newMat.printMatrix();
+                    det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
                 }
-                cout << endl;
-                Matrix newMat = Matrix(newMatContent);
-                newMat.printMatrix();
-                det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
-            }
         }
         
         return det;
@@ -322,7 +329,7 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{1, 66, 9, 4}, {3, 88, 6, 5}, {7, 8, 44, 8}, {44, 5, 6, 7}});
+    Matrix test2 = Matrix({{5, -7, 2, 2}, {0, 3, 0, -4}, {-5, -8, 0, 3}, {0, 5, 0, -6}});
         
     cout << test2.determinant() << endl;
     
