@@ -46,10 +46,11 @@ public:
     void printMatrix();
     unsigned long numRows();
     unsigned long numCols();
-    void transpose();
+    Matrix transpose();
     void ref();
     double determinant();
     Matrix cofactor();
+    Matrix inverse();
     
     // matrix indexing begins at 0
     double getVal(int row, int col) {
@@ -171,7 +172,6 @@ double Matrix::determinant() {
                     break;
                 default:
                     det = 0;
-                    this->printMatrix();
                     for (int i = 0; i < this->numCols(); i++) {
                         vector<vector<double>> newMatContent = {};
                         for (int j = 1; j < this->numCols(); j++) {
@@ -183,9 +183,7 @@ double Matrix::determinant() {
                             }
                             newMatContent.push_back(newRow);
                         }
-                        cout << endl;
                         Matrix newMat = Matrix(newMatContent);
-                        newMat.printMatrix();
                         det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
                     }
             }
@@ -218,8 +216,6 @@ Matrix Matrix::cofactor() {
                 }
             }
             Matrix prunedMat = Matrix(prunedContent);
-            prunedMat.printMatrix();
-            cout << endl;
             cofactorRow.push_back(pow(-1, i + j) * prunedMat.determinant());
         }
         cofactorContent.push_back(cofactorRow);
@@ -229,7 +225,7 @@ Matrix Matrix::cofactor() {
 }
  
 // Transpose matrix
-void Matrix::transpose() {
+Matrix Matrix::transpose() {
     vector<vector<double>> newContent = {};
     for (int i = 0; i < this->numCols(); i++) {
         vector<double> intermediary = {};
@@ -238,9 +234,11 @@ void Matrix::transpose() {
         }
         newContent.push_back(intermediary);
     }
-    this->setContent(newContent);
+    Matrix newMat = Matrix(newContent);
+    return newMat;
 }
 
+// Pretty print matrix
 void Matrix::printMatrix() {
     unsigned long maxLen = 0;
     for (int i = 0; i < content.size(); i++) {
@@ -366,7 +364,21 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
     return lhs -= rhs;
 }
 
-
+// Return inverse of matrix
+Matrix Matrix::inverse() {
+    try {
+        if (this->determinant() == 0) {
+            throw 505;
+        }
+        else {
+            Matrix adjugate = (this->cofactor()).transpose();
+            return (1/this->determinant()) * adjugate;
+        }
+    } catch(...) {
+        cout << "Matrix is not invertible";
+        return Matrix(this->content);
+    }
+}
 
 
 
@@ -376,10 +388,11 @@ Matrix operator-(Matrix lhs, Matrix rhs) {
 int main() {
     Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
     
-    Matrix test2 = Matrix({{1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16}});
+    Matrix test2 = Matrix({{5,6,6,8}, {2,2,2,8}, {6,6,2,8}, {2,3,6,7}});
     
-    Matrix pog = test2.cofactor();
-        
+    Matrix pog = test2.inverse();
+    
+    cout << endl;
     pog.printMatrix();
     
     return 0;
