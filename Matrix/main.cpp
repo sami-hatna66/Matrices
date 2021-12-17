@@ -138,35 +138,46 @@ public:
     double determinant() {
         double det;
         
-        switch(this->numRows()) {
-            case 1:
-                det = this->getVal(0, 0);
-                break;
-            case 2:
-                det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
-                break;
-            case 3:
-                det = (this->getVal(0, 0) * this->getVal(1, 1) * this->getVal(2, 2)) + (this->getVal(0, 1) * this->getVal(1, 2) * this->getVal(2, 0)) + (this->getVal(0, 2) * this->getVal(1, 0) * this->getVal(2, 1)) - (this->getVal(0, 2) * this->getVal(1, 1) * this->getVal(2, 0)) - (this->getVal(0, 0) * this->getVal(1, 2) * this->getVal(2, 1)) - (this->getVal(0, 1) * this->getVal(1, 0) * this->getVal(2, 2));
-                break;
-            default:
-                det = 0;
-                this->printMatrix();
-                for (int i = 0; i < this->numCols(); i++) {
-                    vector<vector<double>> newMatContent = {};
-                    for (int j = 1; j < this->numCols(); j++) {
-                        vector<double> newRow = {};
-                        for (int k = 0; k < this->numCols(); k++) {
-                            if (k != i) {
-                                newRow.push_back(this->getVal(j, k));
+        try {
+            if (this->numCols() != this->numRows()) {
+                throw 505;
+            }
+            
+            else {
+                switch(this->numRows()) {
+                    case 1:
+                        det = this->getVal(0, 0);
+                        break;
+                    case 2:
+                        det = (this->getVal(0, 0) * this->getVal(1, 1)) - (this->getVal(0, 1) * this->getVal(1, 0));
+                        break;
+                    case 3:
+                        det = (this->getVal(0, 0) * this->getVal(1, 1) * this->getVal(2, 2)) + (this->getVal(0, 1) * this->getVal(1, 2) * this->getVal(2, 0)) + (this->getVal(0, 2) * this->getVal(1, 0) * this->getVal(2, 1)) - (this->getVal(0, 2) * this->getVal(1, 1) * this->getVal(2, 0)) - (this->getVal(0, 0) * this->getVal(1, 2) * this->getVal(2, 1)) - (this->getVal(0, 1) * this->getVal(1, 0) * this->getVal(2, 2));
+                        break;
+                    default:
+                        det = 0;
+                        this->printMatrix();
+                        for (int i = 0; i < this->numCols(); i++) {
+                            vector<vector<double>> newMatContent = {};
+                            for (int j = 1; j < this->numCols(); j++) {
+                                vector<double> newRow = {};
+                                for (int k = 0; k < this->numCols(); k++) {
+                                    if (k != i) {
+                                        newRow.push_back(this->getVal(j, k));
+                                    }
+                                }
+                                newMatContent.push_back(newRow);
                             }
+                            cout << endl;
+                            Matrix newMat = Matrix(newMatContent);
+                            newMat.printMatrix();
+                            det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
                         }
-                        newMatContent.push_back(newRow);
-                    }
-                    cout << endl;
-                    Matrix newMat = Matrix(newMatContent);
-                    newMat.printMatrix();
-                    det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
                 }
+            }
+        } catch(...) {
+            cout << "Matrix must be square";
+            return 0;
         }
         
         return det;
@@ -331,7 +342,7 @@ int main() {
     
     Matrix test2 = Matrix({{5, -7, 2, 2}, {0, 3, 0, -4}, {-5, -8, 0, 3}, {0, 5, 0, -6}});
         
-    cout << test2.determinant() << endl;
+    cout << test1.determinant() << endl;
     
     return 0;
 }
