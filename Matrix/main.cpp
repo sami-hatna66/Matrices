@@ -1,8 +1,8 @@
 //
 //  main.cpp
-//  Matrix
+//  temp
 //
-//  Created by Sami Hatna on 04/12/2021.
+//  Created by Sami Hatna on 18/12/2021.
 //
 
 #include <iostream>
@@ -10,11 +10,13 @@
 #include <vector>
 using namespace std;
 
+template<typename T>
 class Matrix {
 private:
-    vector<vector<double>> content;
+    vector<vector<T>> content;
 public:
-    Matrix(vector<vector<double>> c) {
+    Matrix(vector<vector<T>> c) {
+        // Check if valid matrix
         try {
             if (c.size() == 0) {
                 throw 505;
@@ -43,97 +45,154 @@ public:
     // Use if operator needs to access private attributes
     // friend Matrix& operator*=(Matrix& lhs, Matrix rhs);
     
+    // Function declarations
     void printMatrix();
     unsigned long numRows();
     unsigned long numCols();
+    T getVal(int row, int col);
+    void setVal(int row, int col, T newVal);
+    void setContent(vector<vector<T>> newContent);
+    void swapRow(int row1, int row2);
+    void multiplyRow(int row, T scalar);
+    void addScalarMultiple(int rowTarget, int rowAdding, T scalar);
     Matrix transpose();
     void ref();
     double determinant();
     Matrix cofactor();
     Matrix inverse();
     
-    // matrix indexing begins at 0
-    double getVal(int row, int col) {
-        try {
-            if (row > this->numRows() - 1) {
-                throw (string("row"));
-            }
-            else if (col > this->numCols() - 1) {
-                throw (string("col"));
-            }
-            else {
-                return content[row][col];
-            }
-        } catch (string dim) {
-            cout << dim << " out of range" << endl;
-            return 0;
-        }
-    }
-    
-    void setVal(int row, int col, double newVal) {
-        content[row][col] = newVal;
-    }
-    
-    void setContent(vector<vector<double>> newContent) {
-        content = newContent;
-    }
-    
-    // Row operations
-    void swapRow(int row1, int row2) {
-        try {
-            if (row1 < this->numRows() && row2 < this->numRows()) {
-                swap(content[row2], content[row1]);
-            } else { throw 505; }
-        } catch (...) {
-            cout << "Row index out of range" << endl;
-        }
-    }
-    
-    void multiplyRow(int row, double scalar) {
-        try {
-            if (row < this->numRows()) {
-                for (int i = 0; i < this->numCols(); i++) {
-                    content[row][i] *= scalar;
-                }
-            } else { throw 505; }
-        } catch (...) {
-            cout << "Row index out of range" << endl;
-        }
-    }
-    
-    void addScalarMultiple(int rowTarget, int rowAdding, int scalar) {
-        try {
-            if (rowAdding > this->numRows() || rowTarget > this->numRows()) {
-                throw 505;
-            }
-            else {
-                vector<double> multiplied = {};
-                for (int i = 0; i < this->numCols(); i++) {
-                    multiplied.push_back(this->getVal(rowAdding, i) * scalar);
-                }
-                for (int k = 0; k < multiplied.size(); k++) {
-                    content[rowTarget][k] += multiplied[k];
-                }
-            }
-        } catch (...) {
-            cout << "Invalid dimensions" << endl;
-        }
-    }
-    
-    
-    
 };
 
-unsigned long Matrix::numRows() {
+// Pretty print matrix
+template<typename T>
+void Matrix<T>::printMatrix() {
+    unsigned long maxLen = 0;
+    for (int i = 0; i < content.size(); i++) {
+        for (int j = 0; j < content[i].size(); j++) {
+            unsigned long len = to_string(content[i][j]).length();
+            if (len > maxLen) {
+                maxLen = len;
+            }
+        }
+    }
+    
+    for (int i = 0; i < content.size(); i++) {
+        string forPrint = "| ";
+        for_each(content[i].begin(),
+                 content[i].end(),
+                 [&forPrint, &maxLen, *this](T &n){
+                    for (int j = 0; j < (maxLen - to_string(n).length()); j++) {
+                        forPrint += " ";
+                    }
+                    forPrint += to_string(n) + " ";
+        });
+        forPrint += "|";
+        cout << forPrint << endl;
+    }
+}
+
+template<typename T>
+unsigned long Matrix<T>::numRows() {
     return content.size();
 }
 
-unsigned long Matrix::numCols() {
+template<typename T>
+unsigned long Matrix<T>::numCols() {
     return content[0].size();
 }
 
-// Convert matrix to row echelon form
-void Matrix::ref() {
+// Matrix indexing begins at 0
+template<typename T>
+T Matrix<T>::getVal(int row, int col) {
+    try {
+        if (row > this->numRows() - 1) {
+            throw (string("row"));
+        }
+        else if (col > this->numCols() - 1) {
+            throw (string("col"));
+        }
+        else {
+            return content[row][col];
+        }
+    } catch (string dim) {
+        cout << dim << " out of range" << endl;
+        return 0;
+    }
+}
+
+template<typename T>
+void Matrix<T>::setVal(int row, int col, T newVal) {
+    content[row][col] = newVal;
+}
+
+template<typename T>
+void Matrix<T>::setContent(vector<vector<T>> newContent) {
+    content = newContent;
+}
+
+// Elementary row operations
+template<typename T>
+void Matrix<T>::swapRow(int row1, int row2) {
+    try {
+        if (row1 < this->numRows() && row2 < this->numRows()) {
+            swap(content[row2], content[row1]);
+        } else { throw 505; }
+    } catch (...) {
+        cout << "Row index out of range" << endl;
+    }
+}
+
+template<typename T>
+void Matrix<T>::multiplyRow(int row, T scalar) {
+    try {
+        if (row < this->numRows()) {
+            for (int i = 0; i < this->numCols(); i++) {
+                content[row][i] *= scalar;
+            }
+        } else { throw 505; }
+    } catch (...) {
+        cout << "Row index out of range" << endl;
+    }
+}
+
+template<typename T>
+void Matrix<T>::addScalarMultiple(int rowTarget, int rowAdding, T scalar) {
+    try {
+        if (rowAdding > this->numRows() || rowTarget > this->numRows()) {
+            throw 505;
+        }
+        else {
+            vector<T> multiplied = {};
+            for (int i = 0; i < this->numCols(); i++) {
+                multiplied.push_back(this->getVal(rowAdding, i) * scalar);
+            }
+            for (int k = 0; k < multiplied.size(); k++) {
+                content[rowTarget][k] += multiplied[k];
+            }
+        }
+    } catch (...) {
+        cout << "Invalid dimensions" << endl;
+    }
+}
+
+// Transpose matrix
+template<typename T>
+Matrix<T> Matrix<T>::transpose() {
+    vector<vector<T>> newContent = {};
+    for (int i = 0; i < this->numCols(); i++) {
+        vector<T> intermediary = {};
+        for (int j = 0; j < this->numRows(); j++) {
+            intermediary.push_back({content[j][i]});
+        }
+        newContent.push_back(intermediary);
+    }
+    Matrix<T> newMat = Matrix(newContent);
+    return newMat;
+}
+
+// Convert matrix to row echelon form (unfinished)
+template<typename T>
+void Matrix<T>::ref() {
     int col = 0;
     for (int row = 0; row < min(this->numRows(), this->numCols()); row++) {
         this->multiplyRow(row, 1/this->getVal(row, col));
@@ -151,7 +210,8 @@ void Matrix::ref() {
 }
 
 // Calculate determinant using cofactor expansion
-double Matrix::determinant() {
+template<typename T>
+double Matrix<T>::determinant() {
     double det;
     
     try {
@@ -173,9 +233,9 @@ double Matrix::determinant() {
                 default:
                     det = 0;
                     for (int i = 0; i < this->numCols(); i++) {
-                        vector<vector<double>> newMatContent = {};
+                        vector<vector<T>> newMatContent = {};
                         for (int j = 1; j < this->numCols(); j++) {
-                            vector<double> newRow = {};
+                            vector<T> newRow = {};
                             for (int k = 0; k < this->numCols(); k++) {
                                 if (k != i) {
                                     newRow.push_back(this->getVal(j, k));
@@ -183,7 +243,7 @@ double Matrix::determinant() {
                             }
                             newMatContent.push_back(newRow);
                         }
-                        Matrix newMat = Matrix(newMatContent);
+                        Matrix<T> newMat = Matrix(newMatContent);
                         det += (this->getVal(0, i)) * (pow(-1, 2+i)) * newMat.determinant();
                     }
             }
@@ -197,15 +257,16 @@ double Matrix::determinant() {
 }
 
 // Return cofactor matrix
-Matrix Matrix::cofactor() {
-    vector<vector<double>> cofactorContent = {};
+template<typename T>
+Matrix<T> Matrix<T>::cofactor() {
+    vector<vector<T>> cofactorContent = {};
     
     for (int i = 0; i < this->numRows(); i++) {
-        vector<double> cofactorRow = {};
+        vector<T> cofactorRow = {};
         for (int j = 0; j < this->numCols(); j++) {
-            vector<vector<double>> prunedContent = {};
+            vector<vector<T>> prunedContent = {};
             for (int i2 = 0; i2 < this->numRows(); i2++) {
-                vector<double> prunedRow = {};
+                vector<T> prunedRow = {};
                 for (int j2 = 0; j2 < this->numCols(); j2++) {
                     if (i2 != i && j2 != j) {
                         prunedRow.push_back(this->getVal(i2, j2));
@@ -215,67 +276,44 @@ Matrix Matrix::cofactor() {
                     prunedContent.push_back(prunedRow);
                 }
             }
-            Matrix prunedMat = Matrix(prunedContent);
+            Matrix<T> prunedMat = Matrix(prunedContent);
             cofactorRow.push_back(pow(-1, i + j) * prunedMat.determinant());
         }
         cofactorContent.push_back(cofactorRow);
     }
     
-    return Matrix(cofactorContent);
-}
- 
-// Transpose matrix
-Matrix Matrix::transpose() {
-    vector<vector<double>> newContent = {};
-    for (int i = 0; i < this->numCols(); i++) {
-        vector<double> intermediary = {};
-        for (int j = 0; j < this->numRows(); j++) {
-            intermediary.push_back({content[j][i]});
-        }
-        newContent.push_back(intermediary);
-    }
-    Matrix newMat = Matrix(newContent);
-    return newMat;
+    return Matrix<T>(cofactorContent);
 }
 
-// Pretty print matrix
-void Matrix::printMatrix() {
-    unsigned long maxLen = 0;
-    for (int i = 0; i < content.size(); i++) {
-        for (int j = 0; j < content[i].size(); j++) {
-            unsigned long len = to_string(content[i][j]).length();
-            if (len > maxLen) {
-                maxLen = len;
-            }
+// Return inverse of matrix
+template<typename T>
+Matrix<T> Matrix<T>::inverse() {
+    try {
+        if (this->determinant() == 0) {
+            throw 505;
         }
-    }
-    
-    for (int i = 0; i < content.size(); i++) {
-        string forPrint = "| ";
-        for_each(content[i].begin(),
-                 content[i].end(),
-                 [&forPrint, &maxLen, *this](double &n){
-                    for (int j = 0; j < (maxLen - to_string(n).length()); j++) {
-                        forPrint += " ";
-                    }
-                    forPrint += to_string(n) + " ";
-        });
-        forPrint += "|";
-        cout << forPrint << endl;
+        else {
+            Matrix adjugate = (this->cofactor()).transpose();
+            return (1/this->determinant()) * adjugate;
+        }
+    } catch(...) {
+        cout << "Matrix is not invertible";
+        return Matrix(this->content);
     }
 }
 
 // Matrix-Matrix multiplication
-Matrix& operator*=(Matrix& lhs, Matrix rhs) {
+template<typename T>
+Matrix<T>& operator*=(Matrix<T>& lhs, Matrix<T> rhs) {
     try {
         if (lhs.numCols() != rhs.numRows()) { throw 505; }
         else {
-            vector<vector<double>> newContent = {};
+            vector<vector<T>> newContent = {};
             
             for (int i = 0; i < lhs.numRows(); i++) {
-                vector<double> newRow = {};
+                vector<T> newRow = {};
                 for (int j = 0; j < rhs.numCols(); j++) {
-                    double sum = 0;
+                    T sum = 0;
                     for (int k = 0; k < lhs.numCols(); k++) {
                         sum += (lhs.getVal(i, k) * rhs.getVal(k, j));
                     }
@@ -293,31 +331,35 @@ Matrix& operator*=(Matrix& lhs, Matrix rhs) {
     return lhs;
 }
 
-Matrix operator*(Matrix lhs, Matrix rhs) {
+template<typename T>
+Matrix<T> operator*(Matrix<T> lhs, Matrix<T> rhs) {
     return lhs *= rhs;
 }
 
 // Matrix-Scalar multiplication
-Matrix& operator*=(Matrix& lhs, double scalar) {
+template<typename T>
+Matrix<T>& operator*=(Matrix<T>& lhs, double scalar) {
     for (int row = 0; row < lhs.numRows(); row++) {
         for (int col = 0; col < lhs.numCols(); col++) {
             lhs.setVal(row, col, scalar * lhs.getVal(row, col));
         }
     }
-    
     return lhs;
 }
 
-Matrix operator*(Matrix lhs, double scalar) {
+template<typename T>
+Matrix<T> operator*(Matrix<T> lhs, double scalar) {
     return lhs *= scalar;
 }
 // For commutativity
-Matrix operator*(double scalar, Matrix rhs) {
+template<typename T>
+Matrix<T> operator*(double scalar, Matrix<T> rhs) {
     return rhs *= scalar;
 }
 
 // Addition
-Matrix& operator+=(Matrix& lhs, Matrix rhs) {
+template<typename T>
+Matrix<T>& operator+=(Matrix<T>& lhs, Matrix<T> rhs) {
     try {
         if (lhs.numCols() != rhs.numCols() || lhs.numRows() != rhs.numRows()) {
             throw 505;
@@ -336,12 +378,14 @@ Matrix& operator+=(Matrix& lhs, Matrix rhs) {
     return lhs;
 }
 
-Matrix operator+(Matrix lhs, Matrix rhs) {
+template<typename T>
+Matrix<T> operator+(Matrix<T> lhs, Matrix<T> rhs) {
     return lhs += rhs;
 }
 
 // Subtraction
-Matrix& operator-=(Matrix& lhs, Matrix rhs) {
+template <typename T>
+Matrix<T>& operator-=(Matrix<T>& lhs, Matrix<T> rhs) {
     try {
         if (lhs.numCols() != rhs.numCols() || lhs.numRows() != rhs.numRows()) {
             throw 505;
@@ -360,40 +404,18 @@ Matrix& operator-=(Matrix& lhs, Matrix rhs) {
     return lhs;
 }
 
-Matrix operator-(Matrix lhs, Matrix rhs) {
+template <typename T>
+Matrix<T> operator-(Matrix<T> lhs, Matrix<T> rhs) {
     return lhs -= rhs;
 }
-
-// Return inverse of matrix
-Matrix Matrix::inverse() {
-    try {
-        if (this->determinant() == 0) {
-            throw 505;
-        }
-        else {
-            Matrix adjugate = (this->cofactor()).transpose();
-            return (1/this->determinant()) * adjugate;
-        }
-    } catch(...) {
-        cout << "Matrix is not invertible";
-        return Matrix(this->content);
-    }
-}
-
 
 
 
 
 
 int main() {
-    Matrix test1 = Matrix({{1, 2}, {3, 4}, {44, 55}});
-    
-    Matrix test2 = Matrix({{5,6,6,8}, {2,2,2,8}, {6,6,2,8}, {2,3,6,7}});
-    
-    Matrix pog = test2.inverse();
-    
-    cout << endl;
-    pog.printMatrix();
+    Matrix testMat = Matrix<int>({{1,2,3},{4,8,6}, {7,8,9}});
+    testMat.inverse().printMatrix();
     
     return 0;
 }
