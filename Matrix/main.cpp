@@ -60,6 +60,8 @@ public:
     double determinant();
     Matrix cofactor();
     Matrix inverse();
+    void gramSchmidt();
+    vector<T> projection(vector<T> vec, vector<T> dir);
     
 };
 
@@ -409,13 +411,58 @@ Matrix<T> operator-(Matrix<T> lhs, Matrix<T> rhs) {
     return lhs -= rhs;
 }
 
+template <typename T>
+void Matrix<T>::gramSchmidt() {
+    // Transpose matrix to get columns as individual vectors
+    Matrix pog = this->transpose();
+    pog.printMatrix();
+    cout<<endl;
+    
+    vector<vector<T>> qContent = {};
+    qContent.push_back(pog.content[0]);
+    
+    for (int i = 1; i < this->numCols(); i++) {
+        vector<T> result = pog.content[i];
+        for (int j = 0; j < i; j++) {
+            vector<T> proj = projection(pog.content[i], qContent[j]);
+            for (int k = 0; k < proj.size(); k++) {
+                result[k] -= proj[k];
+            }
+        }
+        qContent.push_back(result);
+    }
+    
+    Matrix<T> Q = Matrix(qContent);
+    Q.transpose().printMatrix();
+}
+
+template <typename T>
+vector<T> Matrix<T>::projection(vector<T> vec, vector<T> dir) {
+    double numerator = 0;
+    double denominator = 0;
+    vector<double> result = {};
+    
+    for (int i = 0; i < vec.size(); i++) {
+        numerator += (vec[i] * dir[i]);
+        denominator += (dir[i] * dir[i]);
+    }
+    
+    for (int j = 0; j < vec.size(); j++) {
+        result.push_back(dir[j] * (numerator/denominator));
+    }
+    
+    return result;
+}
+
 
 
 
 
 int main() {
-    Matrix testMat = Matrix<int>({{1,2,3},{4,8,6}, {7,8,9}});
-    testMat.inverse().printMatrix();
+    Matrix testMat = Matrix<double>({{1,1,8},{2,1,7}, {3,8,1}});
+    testMat.printMatrix();
+    cout<<endl;
+    testMat.gramSchmidt();
     
     return 0;
 }
