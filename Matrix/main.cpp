@@ -60,7 +60,7 @@ public:
     double determinant();
     Matrix cofactor();
     Matrix inverse();
-    void gramSchmidt();
+    Matrix gramSchmidt(bool isOrthonormal);
     vector<T> projection(vector<T> vec, vector<T> dir);
     
 };
@@ -412,28 +412,51 @@ Matrix<T> operator-(Matrix<T> lhs, Matrix<T> rhs) {
 }
 
 template <typename T>
-void Matrix<T>::gramSchmidt() {
+Matrix<T> Matrix<T>::gramSchmidt(bool isOrthonormal) {
     // Transpose matrix to get columns as individual vectors
-    Matrix pog = this->transpose();
-    pog.printMatrix();
-    cout<<endl;
+    Matrix transposed = this->transpose();
     
     vector<vector<T>> qContent = {};
-    qContent.push_back(pog.content[0]);
+    if (isOrthonormal) {
+        vector<T> result = transposed.content[0];
+        T squareTotal = 0;
+        for (int l = 0; l < result.size(); l++) {
+            squareTotal += result[l] * result[l];
+        }
+        T magnitude = sqrt(squareTotal);
+        for (int m = 0; m < result.size(); m++) {
+            result[m] /= magnitude;
+        }
+        qContent.push_back(result);
+    }
+    else {
+        qContent.push_back(transposed.content[0]);
+    }
     
     for (int i = 1; i < this->numCols(); i++) {
-        vector<T> result = pog.content[i];
+        vector<T> result = transposed.content[i];
         for (int j = 0; j < i; j++) {
-            vector<T> proj = projection(pog.content[i], qContent[j]);
+            vector<T> proj = projection(transposed.content[i], qContent[j]);
             for (int k = 0; k < proj.size(); k++) {
                 result[k] -= proj[k];
             }
         }
+        if (isOrthonormal) {
+            T squareTotal = 0;
+            for (int l = 0; l < result.size(); l++) {
+                squareTotal += result[l] * result[l];
+            }
+            T magnitude = sqrt(squareTotal);
+            for (int m = 0; m < result.size(); m++) {
+                result[m] /= magnitude;
+            }
+        }
+        
         qContent.push_back(result);
     }
     
     Matrix<T> Q = Matrix(qContent);
-    Q.transpose().printMatrix();
+    return Q.transpose();
 }
 
 template <typename T>
@@ -459,10 +482,11 @@ vector<T> Matrix<T>::projection(vector<T> vec, vector<T> dir) {
 
 
 int main() {
-    Matrix testMat = Matrix<double>({{1,1,8},{2,1,7}, {3,8,1}});
+    Matrix testMat = Matrix<double>({{1,1},{2,1}, {4, 5}, {5, 6}});
     testMat.printMatrix();
     cout<<endl;
-    testMat.gramSchmidt();
+    Matrix p = testMat.gramSchmidt(true);
+    p.printMatrix();
     
     return 0;
 }
