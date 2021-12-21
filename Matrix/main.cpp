@@ -50,6 +50,7 @@ public:
     unsigned long numRows();
     unsigned long numCols();
     T getVal(int row, int col);
+    vector<T> getCol(int col);
     void setVal(int row, int col, T newVal);
     void setContent(vector<vector<T>> newContent);
     void swapRow(int row1, int row2);
@@ -62,6 +63,8 @@ public:
     Matrix inverse();
     Matrix gramSchmidt(bool isOrthonormal);
     vector<T> projection(vector<T> vec, vector<T> dir);
+    vector<Matrix> QRFactorization();
+    T dotProduct(vector<T> vec1, vector<T> vec2);
     
 };
 
@@ -119,6 +122,23 @@ T Matrix<T>::getVal(int row, int col) {
     } catch (string dim) {
         cout << dim << " out of range" << endl;
         return 0;
+    }
+}
+
+// Select individual columns from a matrix (helper function for QRFactorization)
+template<typename T>
+vector<T> Matrix<T>::getCol(int col) {
+    try {
+        if (col > this->numCols() - 1) {
+            throw 505;
+        }
+        else {
+            Matrix<T> transposed = this->transpose();
+            return transposed.content[col];
+        }
+    } catch(...) {
+        cout << "Column out of range";
+        return {0};
     }
 }
 
@@ -411,6 +431,8 @@ Matrix<T> operator-(Matrix<T> lhs, Matrix<T> rhs) {
     return lhs -= rhs;
 }
 
+// Performs Gram-Schmidt process on columns of matrix
+// Result can be made orthonormal by setting parameter to true
 template <typename T>
 Matrix<T> Matrix<T>::gramSchmidt(bool isOrthonormal) {
     // Transpose matrix to get columns as individual vectors
@@ -459,6 +481,7 @@ Matrix<T> Matrix<T>::gramSchmidt(bool isOrthonormal) {
     return Q.transpose();
 }
 
+// Calculates projection of vec in direction of dir (helper function for gramSchmidt)
 template <typename T>
 vector<T> Matrix<T>::projection(vector<T> vec, vector<T> dir) {
     double numerator = 0;
@@ -477,16 +500,62 @@ vector<T> Matrix<T>::projection(vector<T> vec, vector<T> dir) {
     return result;
 }
 
+// Calculates the dot product of two vectors (helper function)
+template <typename T>
+T Matrix<T>::dotProduct(vector<T> vec1, vector<T> vec2) {
+    T result = 0;
+    for (int i = 0; i < vec1.size(); i++) {
+        result += (vec1[i] * vec2[i]);
+    }
+    return result;
+}
+
+// Performs QR factorization on matrix
+// Returns a vector of two matrices containing Q and R
+template <typename T>
+vector<Matrix<T>> Matrix<T>::QRFactorization() {
+    Matrix<T> Q = this->gramSchmidt(true);
+    
+    Matrix<T> notOrthonormal = this->gramSchmidt(false);
+    
+    vector<vector<T>> rContent = {};
+    for (int i = 0; i < this->numCols(); i++) {
+        vector<T> rRow = {};
+        for (int j = 0; j < this->numCols(); j++) {
+            if (j < i) {
+                rRow.push_back(0);
+            }
+            else if (i == j) {
+                vector<T> magCol = notOrthonormal.getCol(i);
+                T result = 0;
+                for (int k = 0; k < magCol.size(); k++) {
+                    result += magCol[k] * magCol[k];
+                }
+                result = sqrt(result);
+                rRow.push_back(result);
+            }
+            else {
+                rRow.push_back(dotProduct(this->getCol(j), Q.getCol(i)));
+            }
+        }
+        rContent.push_back(rRow);
+    }
+    
+    Matrix<T> R = Matrix(rContent);
+    
+    vector<Matrix> result = {Q, R};
+    return result;
+}
+
 
 
 
 
 int main() {
-    Matrix testMat = Matrix<double>({{1,1},{2,1}, {4, 5}, {5, 6}});
+    Matrix testMat = Matrix<double>({{2,3,4}, {8,5,7}, {99,8,7}});
     testMat.printMatrix();
-    cout<<endl;
-    Matrix p = testMat.gramSchmidt(true);
-    p.printMatrix();
+    cout << endl;
+    testMat.QRFactorization();
     
     return 0;
 }
