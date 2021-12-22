@@ -65,6 +65,7 @@ public:
     vector<T> projection(vector<T> vec, vector<T> dir);
     vector<Matrix> QRFactorization();
     T dotProduct(vector<T> vec1, vector<T> vec2);
+    vector<T> eigenvalues();
     
 };
 
@@ -547,15 +548,37 @@ vector<Matrix<T>> Matrix<T>::QRFactorization() {
     return result;
 }
 
+// Find eigenvalues using QR algorithm
+template <typename T>
+vector<T> Matrix<T>::eigenvalues() {
+    vector<T> result = {};
+    
+    Matrix<T> A = Matrix(this->content);
+    
+    for (int i = 0; i < 10; i++) {
+        vector<Matrix> QR = A.QRFactorization();
+        A = QR[1] * QR[0];
+    }
+    
+    for (int j = 0; j < A.numCols(); j++) {
+        result.push_back(round(A.getVal(j, j)));
+    }
+    
+    return result;
+}
+
 
 
 
 
 int main() {
-    Matrix testMat = Matrix<double>({{2,3,4}, {8,5,7}, {99,8,7}});
+    Matrix testMat = Matrix<double>({{8,2,0}, {0,3,0}, {0,0,1}});
     testMat.printMatrix();
     cout << endl;
-    testMat.QRFactorization();
+    vector<double> eigen = testMat.eigenvalues();
+    for (int i = 0; i < eigen.size(); i++) {
+        cout << eigen[i] << ", ";
+    }
     
     return 0;
 }
