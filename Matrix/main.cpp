@@ -47,6 +47,7 @@ public:
     
     // Function declarations
     void printMatrix();
+    Matrix<T>& operator=(Matrix<T>& newMat);
     unsigned long numRows();
     unsigned long numCols();
     T getVal(int row, int col);
@@ -325,6 +326,13 @@ Matrix<T> Matrix<T>::inverse() {
     }
 }
 
+// Assignment
+template<typename T>
+Matrix<T>& Matrix<T>::operator=(Matrix<T>& newMat) {
+    this->setContent(newMat.content);
+    return *this;
+}
+
 // Matrix-Matrix multiplication
 template<typename T>
 Matrix<T>& operator*=(Matrix<T>& lhs, Matrix<T> rhs) {
@@ -573,12 +581,10 @@ vector<T> Matrix<T>::eigenvalues() {
 
 int main() {
     Matrix testMat = Matrix<double>({{8,2,0}, {0,3,0}, {0,0,1}});
+    Matrix testMat2 = Matrix<double>({{8,2,1}, {0,3,0}, {0,0,1}});
+    
+    testMat = testMat2;
     testMat.printMatrix();
-    cout << endl;
-    vector<double> eigen = testMat.eigenvalues();
-    for (int i = 0; i < eigen.size(); i++) {
-        cout << eigen[i] << ", ";
-    }
     
     return 0;
 }
