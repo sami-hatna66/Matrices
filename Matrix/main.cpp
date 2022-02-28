@@ -580,10 +580,9 @@ vector<T> Matrix<T>::eigenvalues() {
 
 
 int main() {
-    Matrix testMat = Matrix<double>({{8,2,0}, {0,3,0}, {0,0,1}});
-    Matrix testMat2 = Matrix<double>({{8,2,1}, {0,3,0}, {0,0,1}});
+    Matrix testMat = Matrix<double>({{8,2,3}, {1,3,5}, {6,8,1}});
     
-    testMat = testMat2;
+    testMat.ref();
     testMat.printMatrix();
     
     return 0;
