@@ -490,6 +490,7 @@ Matrix<T> Matrix<T>::gramSchmidt(bool isOrthonormal) {
     return Q.transpose();
 }
 
+
 // Calculates projection of vec in direction of dir (helper function for gramSchmidt)
 template <typename T>
 vector<T> Matrix<T>::projection(vector<T> vec, vector<T> dir) {
