@@ -566,7 +566,8 @@ vector<T> Matrix<T>::eigenvalues() {
     
     for (int i = 0; i < 10; i++) {
         vector<Matrix> QR = A.QRFactorization();
-        A = QR[1] * QR[0];
+        Matrix<T> product = QR[1] * QR[0];
+        A = product;
     }
     
     for (int j = 0; j < A.numCols(); j++) {
@@ -581,10 +582,73 @@ vector<T> Matrix<T>::eigenvalues() {
 
 
 int main() {
-    Matrix testMat = Matrix<double>({{8,2,3}, {1,3,5}, {6,8,1}});
+    // Initialise matrices
+    Matrix testMat1 = Matrix<double>({{8,2,3}, {1,3,5}, {6,8,1}});
+    Matrix testMat2 = Matrix<double>({{1,2,3}, {7,6,5}, {8,9,5}});
     
-    testMat.ref();
-    testMat.printMatrix();
+    // Output matrix
+    testMat1.printMatrix();
+    
+    // Get dimensions
+    cout << endl << testMat1.numRows() << " x " << testMat1.numCols() << endl;
+    
+    // Get value at position
+    cout << endl << "Value at pos 0x0: " << testMat1.getVal(0, 0) << endl;
+    
+    // Set value at position
+    testMat1.setVal(0, 0, 5);
+    cout << endl << "Value now at pos 0x0: " << testMat1.getVal(0, 0) << endl;
+    
+    // Perform elementary row operations
+    testMat1.swapRow(0, 1);
+    testMat1.multiplyRow(1, 5);
+    testMat1.addScalarMultiple(0, 1, 4);
+    cout << endl << "Apply elementary row operations:" << endl;
+    testMat1.printMatrix();
+    
+    // Transpose matrix
+    cout << endl << "Transpose matrix:" << endl;
+    Matrix transposed = testMat1.transpose();
+    transposed.printMatrix();
+    
+    // Transform matrix to row echelon form
+    cout << endl << "Carry to REF:" << endl;
+    testMat1.ref();
+    testMat1.printMatrix();
+    
+    // Get matrix determinant
+    cout << endl << "Determinant: " << testMat2.determinant() << endl;
+    
+    // Find cofactor matrix
+    cout << endl << "Cofactor matrix:" << endl;
+    Matrix cofactor = testMat2.cofactor();
+    cofactor.printMatrix();
+    
+    // Invert matrix
+    cout << endl << "Invert matrix:" << endl;
+    Matrix inverse = testMat2.inverse();
+    inverse.printMatrix();
+    
+    // Orthogonalise matrix using gram-schmidt
+    cout << endl << "Orthogonalise matrix:" << endl;
+    Matrix orthogonal = testMat2.gramSchmidt(false);
+    orthogonal.printMatrix();
+    
+    // Orthonormalize matrix
+    cout << endl << "Orthonormalize matrix:" << endl;
+    Matrix orthonormal = testMat2.gramSchmidt(true);
+    orthonormal.printMatrix();
+    
+    // Perform QR factorization
+    vector<Matrix<double>> qr = testMat2.QRFactorization();
+    
+    // Return vector of eigenvalues
+    cout << endl << "Find eigenvalues: ";
+    vector<double> eigenvalues = testMat2.eigenvalues();
+    for (auto i : eigenvalues) {
+        cout << i << ", ";
+    }
+    cout << endl;
     
     return 0;
 }
