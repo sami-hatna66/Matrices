@@ -648,7 +648,7 @@ int main() {
     for (auto i : eigenvalues) {
         cout << i << ", ";
     }
-    cout << endl;
+    cout << endl << endl;
     
     return 0;
 }
