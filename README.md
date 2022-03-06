@@ -52,6 +52,16 @@ int main() {
     cout << endl << "Apply elementary row operations:" << endl;
     testMat1.printMatrix();
     
+    // Matrix multiplication
+    Matrix multiply = testMat1 * testMat2;
+    cout << endl << "Multiply Matrix 1 by Matrix 2:" << endl;
+    multiply.printMatrix();
+    
+    // Matrix addition
+    testMat1 += testMat2;
+    cout << endl << "Add Matrix 2 to Matrix 1:" << endl;
+    testMat1.printMatrix();
+    
     // Transpose matrix
     cout << endl << "Transpose matrix:" << endl;
     Matrix transposed = testMat1.transpose();
@@ -118,15 +128,25 @@ Apply elementary row operations:
 |  25.000000  10.000000  15.000000 |
 |   6.000000   8.000000   1.000000 |
 
+Multiply Matrix 1 by Matrix 2:
+|  922.000000 1045.000000  843.000000 |
+|  215.000000  245.000000  200.000000 |
+|   70.000000   69.000000   63.000000 |
+
+Add Matrix 2 to Matrix 1:
+| 102.000000  45.000000  68.000000 |
+|  32.000000  16.000000  20.000000 |
+|  14.000000  17.000000   6.000000 |
+
 Transpose matrix:
-| 101.000000  25.000000   6.000000 |
-|  43.000000  10.000000   8.000000 |
-|  65.000000  15.000000   1.000000 |
+| 102.000000  32.000000  14.000000 |
+|  45.000000  16.000000  17.000000 |
+|  68.000000  20.000000   6.000000 |
 
 Carry to REF:
-|  1.000000  0.425743  0.643564 |
-| -0.000000  1.000000  1.692308 |
-| -0.000000 -0.000000  1.000000 |
+|  1.000000  0.441176  0.666667 |
+|  0.000000  1.000000 -0.708333 |
+|  0.000000  0.000000  1.000000 |
 
 Determinant: 40
 

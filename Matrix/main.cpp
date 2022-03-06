@@ -577,10 +577,6 @@ vector<T> Matrix<T>::eigenvalues() {
     return result;
 }
 
-
-
-
-
 int main() {
     // Initialise matrices
     // Matrix class is a template so can be used with int, double and float types
@@ -605,6 +601,16 @@ int main() {
     testMat1.multiplyRow(1, 5);
     testMat1.addScalarMultiple(0, 1, 4);
     cout << endl << "Apply elementary row operations:" << endl;
+    testMat1.printMatrix();
+    
+    // Matrix multiplication
+    Matrix multiply = testMat1 * testMat2;
+    cout << endl << "Multiply Matrix 1 by Matrix 2:" << endl;
+    multiply.printMatrix();
+    
+    // Matrix addition
+    testMat1 += testMat2;
+    cout << endl << "Add Matrix 2 to Matrix 1:" << endl;
     testMat1.printMatrix();
     
     // Transpose matrix
