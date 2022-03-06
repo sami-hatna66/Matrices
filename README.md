@@ -2,7 +2,7 @@
 
 A linear algebra module implemented in C++
 
-####Features:
+#### Features:
 - Template support = working with different numerical data types
 - Pretty printing
 - Addition, Subtraction and Multiplication
@@ -100,7 +100,7 @@ int main() {
 }
 ```
 
-###Output:
+### Output:
 
 ```
 | 8.000000 2.000000 3.000000 |
