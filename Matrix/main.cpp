@@ -581,7 +581,7 @@ int main() {
     // Initialise matrices
     // Matrix class is a template so can be used with int, double and float types
     Matrix testMat1 = Matrix<double>({{8,2,3}, {1,3,5}, {6,8,1}});
-    Matrix testMat2 = Matrix<double>({{1,2,3}, {7,6,5}, {8,9,5}});
+    Matrix testMat2 = Matrix<double>({{-2,-4,2}, {-2,1,2}, {4,2,5}});
     
     // Output matrix
     testMat1.printMatrix();
