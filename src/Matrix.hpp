@@ -8,23 +8,23 @@
 #ifndef Matrix_hpp
 #define Matrix_hpp
 
+#include <cmath>
+#include <iostream>
 #include <stdio.h>
 #include <vector>
-#include <iostream>
-#include <cmath>
 
-template<typename T>
-class Matrix {
-private:
+template <typename T> class Matrix {
+  private:
     std::vector<std::vector<T>> content;
-public:
+
+  public:
     Matrix(std::vector<std::vector<T>> c);
     void printMatrix();
-    Matrix<T>& operator=(Matrix<T>& newMat);
-    Matrix<T>& operator*=(Matrix<T> rhs);
-    Matrix<T>& operator*=(double scalar);
-    Matrix<T>& operator+=(Matrix<T> rhs);
-    Matrix<T>& operator-=(Matrix<T> rhs);
+    Matrix<T> &operator=(Matrix<T> &newMat);
+    Matrix<T> &operator*=(Matrix<T> rhs);
+    Matrix<T> &operator*=(double scalar);
+    Matrix<T> &operator+=(Matrix<T> rhs);
+    Matrix<T> &operator-=(Matrix<T> rhs);
     unsigned long numRows();
     unsigned long numCols();
     T getVal(int row, int col);
