@@ -17,15 +17,10 @@ template <typename T> Matrix<T>::Matrix(std::vector<std::vector<T>> c) {
             unsigned long prevLength = c[0].size();
             for (int i = 1; i < c.size(); i++) {
                 if (prevLength != c[i].size()) {
-                    flag = false;
-                    break;
+                    throw 505;
                 }
             }
-            if (!flag) {
-                throw 505;
-            } else {
-                content = c;
-            }
+            content = c;
         }
     } catch (...) {
         std::cout << "Input error" << std::endl;
@@ -34,29 +29,27 @@ template <typename T> Matrix<T>::Matrix(std::vector<std::vector<T>> c) {
 
 // Pretty print matrix
 template <typename T> void Matrix<T>::printMatrix() {
-    unsigned long maxLen = 0;
-    for (int i = 0; i < content.size(); i++) {
-        for (int j = 0; j < content[i].size(); j++) {
-            unsigned long len = std::to_string(content[i][j]).length();
+    int maxLen = 0;
+    int row = 0;
+    std::for_each(content.begin(), content.end(), [&](const std::vector<T>& col) {
+        row++;
+        std::for_each(col.begin(), col.end(), [&](T val) {
+            unsigned long len = std::to_string(val).length();
             if (len > maxLen) {
                 maxLen = len;
             }
-        }
-    }
+        });
+    });
 
-    for (int i = 0; i < content.size(); i++) {
-        std::string forPrint = "| ";
-        for_each(content[i].begin(), content[i].end(),
-                 [&forPrint, &maxLen, *this](T &n) {
-                     for (int j = 0; j < (maxLen - std::to_string(n).length());
-                          j++) {
-                         forPrint += " ";
-                     }
-                     forPrint += std::to_string(n) + " ";
-                 });
-        forPrint += "|";
-        std::cout << forPrint << std::endl;
-    }
+    row = 0;
+    std::for_each(content.begin(), content.end(), [&](const std::vector<T>& col) {
+        row++;
+        std::cout << "| ";
+        std::for_each(col.begin(), col.end(), [&](T val) {
+            std::cout << std::setw(maxLen) << std::to_string(val) << " ";
+        });
+        std::cout << "|" << std::endl;
+    }); 
 }
 
 template <typename T> unsigned long Matrix<T>::numRows() {
@@ -89,8 +82,11 @@ template <typename T> std::vector<T> Matrix<T>::getCol(int col) {
         if (col > this->numCols() - 1) {
             throw 505;
         } else {
-            Matrix<T> transposed = this->transpose();
-            return transposed.content[col];
+            std::vector<T> column;
+            for (int i = 0; i < this->numRows(); i++) {
+                column.push_back(this->getVal(i, col));
+            }
+            return column;
         }
     } catch (...) {
         std::cout << "Column out of range";
@@ -140,12 +136,8 @@ void Matrix<T>::addScalarMultiple(int rowTarget, int rowAdding, T scalar) {
         if (rowAdding > this->numRows() || rowTarget > this->numRows()) {
             throw 505;
         } else {
-            std::vector<T> multiplied = {};
             for (int i = 0; i < this->numCols(); i++) {
-                multiplied.push_back(this->getVal(rowAdding, i) * scalar);
-            }
-            for (int k = 0; k < multiplied.size(); k++) {
-                content[rowTarget][k] += multiplied[k];
+                content[rowTarget][i] += (this->getVal(rowAdding, i) * scalar);
             }
         }
     } catch (...) {
@@ -173,14 +165,10 @@ template <typename T> void Matrix<T>::ref() {
     for (int row = 0; row < std::min(this->numRows(), this->numCols()); row++) {
         this->multiplyRow(row, 1 / this->getVal(row, col));
 
-        // this->printMatrix();
-        // cout << endl;
         for (int row2 = row + 1; row2 < this->numRows(); row2++) {
             this->addScalarMultiple(row2, row, -this->getVal(row2, col));
         }
 
-        // this->printMatrix();
-        // cout <<endl;
         col++;
     }
 }
@@ -220,9 +208,9 @@ template <typename T> double Matrix<T>::determinant() {
             default:
                 det = 0;
                 for (int i = 0; i < this->numCols(); i++) {
-                    std::vector<std::vector<T>> newMatContent = {};
+                    std::vector<std::vector<T>> newMatContent;
                     for (int j = 1; j < this->numCols(); j++) {
-                        std::vector<T> newRow = {};
+                        std::vector<T> newRow;
                         for (int k = 0; k < this->numCols(); k++) {
                             if (k != i) {
                                 newRow.push_back(this->getVal(j, k));
@@ -246,14 +234,14 @@ template <typename T> double Matrix<T>::determinant() {
 
 // Return cofactor matrix
 template <typename T> Matrix<T> Matrix<T>::cofactor() {
-    std::vector<std::vector<T>> cofactorContent = {};
+    std::vector<std::vector<T>> cofactorContent;
 
     for (int i = 0; i < this->numRows(); i++) {
-        std::vector<T> cofactorRow = {};
+        std::vector<T> cofactorRow;
         for (int j = 0; j < this->numCols(); j++) {
             std::vector<std::vector<T>> prunedContent = {};
             for (int i2 = 0; i2 < this->numRows(); i2++) {
-                std::vector<T> prunedRow = {};
+                std::vector<T> prunedRow;
                 for (int j2 = 0; j2 < this->numCols(); j2++) {
                     if (i2 != i && j2 != j) {
                         prunedRow.push_back(this->getVal(i2, j2));
@@ -302,7 +290,7 @@ template <typename T> Matrix<T> &Matrix<T>::operator*=(Matrix<T> rhs) {
             std::vector<std::vector<T>> newContent = {};
 
             for (int i = 0; i < this->numRows(); i++) {
-                std::vector<T> newRow = {};
+                std::vector<T> newRow;
                 for (int j = 0; j < rhs.numCols(); j++) {
                     T sum = 0;
                     for (int k = 0; k < this->numCols(); k++) {
@@ -400,7 +388,7 @@ template <typename T> Matrix<T> Matrix<T>::gramSchmidt(bool isOrthonormal) {
     // Transpose matrix to get columns as individual vectors
     Matrix transposed = this->transpose();
 
-    std::vector<std::vector<T>> qContent = {};
+    std::vector<std::vector<T>> qContent;
     if (isOrthonormal) {
         std::vector<T> result = transposed.content[0];
         T squareTotal = 0;
@@ -449,7 +437,7 @@ template <typename T>
 std::vector<T> Matrix<T>::projection(std::vector<T> vec, std::vector<T> dir) {
     double numerator = 0;
     double denominator = 0;
-    std::vector<double> result = {};
+    std::vector<double> result;
 
     for (int i = 0; i < vec.size(); i++) {
         numerator += (vec[i] * dir[i]);
@@ -482,7 +470,7 @@ template <typename T> std::vector<Matrix<T>> Matrix<T>::QRFactorization() {
 
     std::vector<std::vector<T>> rContent = {};
     for (int i = 0; i < this->numCols(); i++) {
-        std::vector<T> rRow = {};
+        std::vector<T> rRow;
         for (int j = 0; j < this->numCols(); j++) {
             if (j < i) {
                 rRow.push_back(0);
@@ -509,7 +497,7 @@ template <typename T> std::vector<Matrix<T>> Matrix<T>::QRFactorization() {
 
 // Find eigenvalues using QR algorithm
 template <typename T> std::vector<T> Matrix<T>::eigenvalues() {
-    std::vector<T> result = {};
+    std::vector<T> result;
 
     Matrix<T> A = Matrix(this->content);
 
