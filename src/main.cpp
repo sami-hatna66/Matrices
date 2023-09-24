@@ -9,7 +9,6 @@
 #include <iostream>
 #include <vector>
 
-#include "Matrix.cpp"
 #include "Matrix.hpp"
 
 int main() {
